@@ -1,0 +1,14 @@
+# Visual Paradigm
+*.vpp.bak_*
+*.vpp.lck
+~*
+vpworkspace/
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Прочее
+*.log
