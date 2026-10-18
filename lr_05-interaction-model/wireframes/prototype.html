@@ -1,0 +1,410 @@
+<title>Прототип Fitness &amp; Health</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600&display=swap">
+<style>
+/* Layout: шапка со сценариями → «экран» приложения в рамке → полоса привязки к шагу варианта использования */
+:root{
+  --bg:#F6F3FC; --surface:#FFFFFF; --surface-2:#F1ECFB; --fg:#221B33; --muted:#6B6382;
+  --line:#E3DCF2; --primary:#6B3FD4; --primary-soft:#EDE6FF; --on-primary:#FFFFFF;
+  --accent:#0E9A74; --accent-soft:#E3F6EF; --danger:#C0392B; --danger-soft:#FBECEA;
+  --warn:#9A6C0B; --warn-soft:#FBF2DD;
+  --r:14px; --display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141020; --surface:#1D1830; --surface-2:#262038; --fg:#ECE8F8; --muted:#A49CBF;
+  --line:#352D4D; --primary:#9D80FF; --primary-soft:#2A2145; --on-primary:#170F2B;
+  --accent:#3CCB9D; --accent-soft:#11352C; --danger:#FF8D7E; --danger-soft:#3A2020;
+  --warn:#E5BC57; --warn-soft:#352A12; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#141020; --surface:#1D1830; --surface-2:#262038; --fg:#ECE8F8; --muted:#A49CBF;
+  --line:#352D4D; --primary:#9D80FF; --primary-soft:#2A2145; --on-primary:#170F2B;
+  --accent:#3CCB9D; --accent-soft:#11352C; --danger:#FF8D7E; --danger-soft:#3A2020;
+  --warn:#E5BC57; --warn-soft:#352A12; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.5;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));
+      padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 36px}
+h1,h2,h3{text-wrap:balance;margin:0}
+button{font:inherit;cursor:pointer}
+
+/* ── шапка ── */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+     padding-block:6px 18px}
+.mark{font-family:var(--display);font-size:17px;letter-spacing:-.01em}
+.mark b{color:var(--primary);font-weight:600}
+.mark i{font-style:normal;color:var(--accent)}
+.flows{display:flex;gap:6px;background:var(--surface-2);padding:4px;border-radius:999px}
+.flow{border:0;background:transparent;color:var(--muted);padding:7px 16px;border-radius:999px;
+      font-size:13px;font-weight:600}
+.flow[aria-current="true"]{background:var(--surface);color:var(--primary);
+      box-shadow:0 1px 3px rgba(34,27,51,.12)}
+.reset{border:1px solid var(--line);background:var(--surface);color:var(--muted);
+       padding:7px 14px;border-radius:999px;font-size:12px}
+
+/* ── рамка экрана ── */
+.frame{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+       box-shadow:0 6px 24px rgba(34,27,51,.07)}
+.bar{display:flex;align-items:center;gap:7px;padding:10px 14px;background:var(--surface-2);
+     border-bottom:1px solid var(--line)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.addr{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:999px;
+      padding:4px 12px;font-size:11px;color:var(--muted);margin-left:6px;overflow:hidden;
+      text-overflow:ellipsis;white-space:nowrap}
+.appbar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+        padding:14px 22px;border-bottom:1px solid var(--line)}
+.logo{font-family:var(--display);font-size:14px}
+.logo b{color:var(--primary);font-weight:600}
+.logo i{font-style:normal;color:var(--accent)}
+.user{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)}
+.ava{width:26px;height:26px;border-radius:50%;background:var(--primary-soft);color:var(--primary);
+     display:grid;place-items:center;font-size:11px;font-weight:700}
+.screen{padding:26px 22px;min-height:330px}
+.mid{max-width:380px;margin:0 auto}
+.hero{text-align:center;padding-block:28px}
+.hero h2{font-family:var(--display);font-size:clamp(19px,3.4vw,25px);line-height:1.25}
+.hero p{color:var(--muted);margin:10px 0 22px;font-size:14px}
+
+/* ── типовые элементы ── */
+.ttl{font-size:17px;font-weight:600;margin-bottom:16px}
+.lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+.fld{margin-bottom:13px}
+input{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;background:var(--surface);
+      color:var(--fg);padding:0 13px;font:inherit;font-size:14px}
+input:focus-visible,button:focus-visible,.row:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.two{display:flex;gap:11px}.two .fld{flex:1;min-width:0}
+.btn{height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+     color:var(--fg);padding:0 20px;font-size:14px;font-weight:600;display:inline-flex;
+     align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.btn.p{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.btn.g{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.w{width:100%}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--muted);background:var(--surface-2);border-radius:10px;
+      padding:11px 13px;margin-top:16px}
+.hint b{color:var(--fg);font-weight:600}
+.note{border-radius:11px;padding:13px 15px;font-size:13.5px;display:flex;gap:10px;margin-bottom:18px}
+.note .i{font-weight:700;flex:none}
+.note.err{background:var(--danger-soft);color:var(--danger)}
+.note.ok{background:var(--accent-soft);color:var(--accent)}
+.note.warn{background:var(--warn-soft);color:var(--warn)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.tile{border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.tile .k{font-size:12px;color:var(--muted)}
+.tile .v{font-size:23px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
+.tile .v.sm{font-size:15px;font-weight:600;margin-top:7px}
+.tile.hl{background:var(--primary-soft);border-color:transparent}
+.tile.hl .v{color:var(--primary)}
+.list{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 17px;
+     border-bottom:1px solid var(--line);background:transparent;width:100%;border-left:0;
+     border-right:0;border-top:0;text-align:left;color:var(--fg)}
+.row:last-child{border-bottom:0}
+.row:hover{background:var(--surface-2)}
+.row .n{display:block;font-weight:600;font-size:14px;font-variant-numeric:tabular-nums}
+.row .m{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.pill.on{background:var(--accent-soft);color:var(--accent)}
+.pill.off{background:var(--danger-soft);color:var(--danger)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:8px 0;font-size:13.5px;
+    border-bottom:1px dashed var(--line)}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted)}
+.kv .v{font-weight:600;font-variant-numeric:tabular-nums}
+.cap{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;
+     font-weight:600;margin-bottom:9px}
+.back{border:0;background:transparent;color:var(--primary);font-size:13px;font-weight:600;
+      padding:0;margin-bottom:14px}
+
+/* ── полоса привязки к шагу ВИ ── */
+.step{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding:13px 16px;
+      background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.badge{font-size:11px;font-weight:700;letter-spacing:.04em;padding:4px 10px;border-radius:999px;
+       background:var(--primary-soft);color:var(--primary);white-space:nowrap}
+.badge.alt{background:var(--warn-soft);color:var(--warn)}
+.step p{margin:0;font-size:13px;color:var(--muted);min-width:0}
+@media (max-width:560px){.cols{grid-template-columns:1fr}.screen{padding:20px 16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="mark"><b>Fitness</b> <i>&amp;</i> <b>Health</b> — кликабельный прототип</div>
+    <div class="flows" role="tablist" aria-label="Сценарии">
+      <button class="flow" id="f03" role="tab" aria-current="true">UC03 · Вход</button>
+      <button class="flow" id="f08" role="tab" aria-current="false">UC08 · Пополнение</button>
+    </div>
+    <button class="reset" id="reset">Сбросить демо</button>
+  </header>
+
+  <div class="frame">
+    <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="addr" id="addr">https://fitness-health.ru/</span></div>
+
+    <div class="appbar">
+      <div class="logo"><b>Fitness</b> <i>&amp;</i> <b>Health</b> · программа лояльности</div>
+      <div class="user" id="user"><span>Вход не выполнен</span></div>
+    </div>
+
+    <div class="screen">
+      <!-- UC03 -->
+      <section data-s="uc03-start" class="hero">
+        <h2>Фитнес-баллы за каждую тренировку</h2>
+        <p>Клубные карты, вознаграждения и запись на занятия — в одном кабинете</p>
+        <div class="btns" style="justify-content:center">
+          <button class="btn p" data-go="uc03-login">Войти</button>
+          <button class="btn">Создать учётную запись</button>
+        </div>
+      </section>
+
+      <section data-s="uc03-login" class="mid" hidden>
+        <h3 class="ttl">Вход в личный кабинет</h3>
+        <div class="fld"><label class="lbl" for="ph">Номер телефона</label>
+          <input id="ph" value="+7 999 123-45-67" autocomplete="off"></div>
+        <div class="fld"><label class="lbl" for="pw">Пароль</label>
+          <input id="pw" type="password" value="" autocomplete="off"></div>
+        <button class="btn p w" id="doLogin">Войти</button>
+        <p class="hint"><b>Демо-данные.</b> Пароль <b>123456</b> — успешный вход.
+          Любой другой — ошибка авторизации. Телефон <b>+7 999 000-00-00</b> — заблокированная учётная запись.</p>
+      </section>
+
+      <section data-s="uc03-error" class="mid" hidden>
+        <div class="note err"><span class="i">!</span><span>Неверный номер телефона или пароль.
+          Проверьте данные и повторите ввод.</span></div>
+        <div class="btns"><button class="btn p" style="flex:1" data-go="uc03-login">Повторить ввод</button>
+          <button class="btn" style="flex:1" data-go="uc03-start">На главную</button></div>
+      </section>
+
+      <section data-s="uc03-blocked" class="mid" hidden>
+        <div class="note warn"><span class="i">!</span><span>Учётная запись заблокирована менеджером
+          платформы. Обратитесь на стойку администратора клуба или напишите на support@fitness-health.ru.</span></div>
+        <button class="btn w" data-go="uc03-start">Вернуться на главную</button>
+      </section>
+
+      <section data-s="uc03-cabinet" hidden>
+        <h3 class="ttl">Личный кабинет</h3>
+        <div class="tiles">
+          <div class="tile hl"><div class="k">Фитнес-баллы</div><div class="v" data-pts>420</div></div>
+          <div class="tile"><div class="k">Баланс по картам</div><div class="v" data-bal>1 150 ₽</div></div>
+          <div class="tile"><div class="k">Клубные карты</div><div class="v">2</div></div>
+          <div class="tile"><div class="k">Активных броней</div><div class="v">1</div></div>
+        </div>
+        <div class="cap">Разделы</div>
+        <div class="btns">
+          <button class="btn" data-go="uc08-cards">Мои клубные карты</button>
+          <button class="btn">Вознаграждения</button>
+          <button class="btn">Расписание тренировок</button>
+          <button class="btn">Мои бронирования</button>
+        </div>
+      </section>
+
+      <!-- UC08 -->
+      <section data-s="uc08-cards" hidden>
+        <h3 class="ttl">Мои клубные карты</h3>
+        <div class="list">
+          <button class="row" data-go="uc08-card">
+            <span><span class="n">FH-4250 0002 3456</span>
+              <span class="m" data-cardline>Баланс 1 150 ₽ · выдана 10.12.2024</span></span>
+            <span class="pill on">Активна</span></button>
+          <button class="row" data-go="uc08-blockedcard">
+            <span><span class="n">FH-4250 0007 8901</span>
+              <span class="m">Баланс 0 ₽ · заблокирована 03.09.2026</span></span>
+            <span class="pill off">Заблокирована</span></button>
+        </div>
+        <p class="hint">Выберите карту, чтобы посмотреть детали и пополнить баланс.</p>
+      </section>
+
+      <section data-s="uc08-blockedcard" hidden>
+        <button class="back" data-go="uc08-cards">← К списку карт</button>
+        <div class="note err"><span class="i">!</span><span>Карта FH-4250 0007 8901 заблокирована.
+          Пополнение заблокированной карты невозможно.</span></div>
+      </section>
+
+      <section data-s="uc08-card" hidden>
+        <button class="back" data-go="uc08-cards">← К списку карт</button>
+        <div class="cols">
+          <div>
+            <div class="cap">Карта</div>
+            <div class="card">
+              <div class="kv"><span class="k">Номер</span><span class="v">FH-4250 0002 3456</span></div>
+              <div class="kv"><span class="k">Статус</span><span class="v">Активна</span></div>
+              <div class="kv"><span class="k">Баланс</span><span class="v" data-bal>1 150 ₽</span></div>
+              <div class="kv"><span class="k">Фитнес-баллы</span><span class="v" data-pts>420</span></div>
+            </div>
+            <div class="btns" style="margin-top:14px">
+              <button class="btn p" data-go="uc08-form">Пополнить баланс</button>
+              <button class="btn">Заблокировать</button>
+            </div>
+          </div>
+          <div>
+            <div class="cap">Последние операции</div>
+            <div class="card" id="ops">
+              <div class="kv"><span class="k">12.10.2026 · Оплата услуги</span><span class="v">−800 ₽</span></div>
+              <div class="kv"><span class="k">05.10.2026 · Пополнение</span><span class="v">+2 000 ₽</span></div>
+              <div class="kv"><span class="k">28.09.2026 · Оплата услуги</span><span class="v">−450 ₽</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-s="uc08-form" class="mid" hidden>
+        <button class="back" data-go="uc08-card">← К карте</button>
+        <h3 class="ttl">Пополнение FH-4250 0002 3456</h3>
+        <div class="fld"><label class="lbl" for="bk">Номер банковской карты</label>
+          <input id="bk" value="4276 1234 5678 9012" autocomplete="off"></div>
+        <div class="two">
+          <div class="fld"><label class="lbl" for="ex">Срок действия</label>
+            <input id="ex" value="09/28" autocomplete="off"></div>
+          <div class="fld"><label class="lbl" for="am">Сумма, ₽</label>
+            <input id="am" value="" inputmode="numeric" placeholder="от 100 до 50 000" autocomplete="off"></div>
+        </div>
+        <div class="note err" id="amErr" hidden><span class="i">!</span>
+          <span>Сумма пополнения должна быть от 100 до 50 000 ₽.</span></div>
+        <button class="btn p w" id="doPay">Пополнить</button>
+        <p class="hint"><b>Демо-данные.</b> Сумма свыше <b>5 000 ₽</b> даёт 50 фитнес-баллов по правилу
+          BR-007. Карта, оканчивающаяся на <b>0000</b>, отклоняется платёжным шлюзом.</p>
+      </section>
+
+      <section data-s="uc08-success" hidden>
+        <div class="note ok"><span class="i">✓</span><span id="okText">Баланс пополнен.</span></div>
+        <div class="tiles">
+          <div class="tile"><div class="k">Баланс карты</div><div class="v" data-bal>7 150 ₽</div></div>
+          <div class="tile hl"><div class="k">Фитнес-баллы</div><div class="v" data-pts>470</div></div>
+          <div class="tile"><div class="k">Операция</div><div class="v sm" id="opNo">№ 10842 · Пополнение</div></div>
+        </div>
+        <div class="btns"><button class="btn" data-go="uc08-cards">К списку карт</button>
+          <button class="btn" data-go="uc08-card">К карте</button></div>
+      </section>
+
+      <section data-s="uc08-error" hidden>
+        <div class="note err"><span class="i">!</span><span>Пополнение не выполнено. Платёжный шлюз
+          отклонил транзакцию: недостаточно средств на банковской карте. Деньги не списаны.</span></div>
+        <div class="tiles">
+          <div class="tile"><div class="k">Баланс карты</div><div class="v" data-bal>1 150 ₽</div></div>
+          <div class="tile"><div class="k">Фитнес-баллы</div><div class="v" data-pts>420</div></div>
+        </div>
+        <div class="btns"><button class="btn p" data-go="uc08-form">Повторить пополнение</button>
+          <button class="btn" data-go="uc08-cards">К списку карт</button></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="step"><span class="badge" id="bdg">UC03 · шаг 1</span><p id="cap">—</p></div>
+</div>
+
+<script>
+(function(){
+  var S = {
+    "uc03-start":   {u:"https://fitness-health.ru/",            b:"UC03 · предусловие", alt:0,
+                     c:"Участник не аутентифицирован. Нажатие «Войти» — стартовое событие варианта использования."},
+    "uc03-login":   {u:"https://fitness-health.ru/login",       b:"UC03 · шаги 2–3", alt:0,
+                     c:"Система запрашивает телефон и пароль, участник вводит данные."},
+    "uc03-error":   {u:"https://fitness-health.ru/login",       b:"UC03 · поток 4А", alt:1,
+                     c:"Неверная комбинация. Сообщение не уточняет, какое поле неверно, — критерий приёмки 2."},
+    "uc03-blocked": {u:"https://fitness-health.ru/login",       b:"UC03 · поток 4Б", alt:1,
+                     c:"Учётная запись заблокирована менеджером платформы. Доступ не предоставлен."},
+    "uc03-cabinet": {u:"https://fitness-health.ru/account",     b:"UC03 · шаг 5", alt:0,
+                     c:"Постусловие выполнено: сессия создана, функции программы доступны."},
+    "uc08-cards":   {u:"https://fitness-health.ru/account/cards", b:"UC08 · шаг 2", alt:0,
+                     c:"Система отображает список клубных карт участника."},
+    "uc08-card":    {u:"https://fitness-health.ru/account/cards/FH-4250-0002-3456", b:"UC08 · шаг 4", alt:0,
+                     c:"Детали выбранной карты и история операций по ней."},
+    "uc08-blockedcard":{u:"https://fitness-health.ru/account/cards", b:"UC08 · поток 3А", alt:1,
+                     c:"Выбрана заблокированная карта — пополнение невозможно (BR-008)."},
+    "uc08-form":    {u:"https://fitness-health.ru/account/cards/FH-4250-0002-3456/topup", b:"UC08 · шаги 6–7", alt:0,
+                     c:"Система запрашивает реквизиты банковской карты и сумму пополнения."},
+    "uc08-success": {u:"https://fitness-health.ru/account/cards/FH-4250-0002-3456/topup", b:"UC08 · шаги 10–11", alt:0,
+                     c:"Создана операция пополнения, увеличен баланс карты."},
+    "uc08-error":   {u:"https://fitness-health.ru/account/cards/FH-4250-0002-3456/topup", b:"UC08 · поток 9А", alt:1,
+                     c:"Платёжный шлюз отказал. Баланс и баллы не изменились, операция не создана."}
+  };
+  var D = {bal:1150, pts:420, auth:false, op:10842};
+  var $ = function(s){return document.querySelector(s)};
+  var all = function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+  var fmt = function(n){return n.toLocaleString("ru-RU")};
+
+  function paint(){
+    all("[data-bal]").forEach(function(e){e.textContent = fmt(D.bal) + " ₽"});
+    all("[data-pts]").forEach(function(e){e.textContent = fmt(D.pts)});
+    var cl = $("[data-cardline]"); if(cl) cl.textContent = "Баланс " + fmt(D.bal) + " ₽ · выдана 10.12.2024";
+    $("#user").innerHTML = D.auth
+      ? '<span>Соколов Иван</span><span class="ava">СИ</span>'
+      : '<span>Вход не выполнен</span>';
+  }
+
+  function show(id, push){
+    if(!S[id]) id = "uc03-start";
+    all("[data-s]").forEach(function(e){ e.hidden = (e.getAttribute("data-s") !== id) });
+    var m = S[id];
+    $("#addr").textContent = m.u;
+    $("#bdg").textContent = m.b;
+    $("#bdg").className = "badge" + (m.alt ? " alt" : "");
+    $("#cap").textContent = m.c;
+    $("#f03").setAttribute("aria-current", id.indexOf("uc03") === 0 ? "true" : "false");
+    $("#f08").setAttribute("aria-current", id.indexOf("uc08") === 0 ? "true" : "false");
+    D.auth = (id.indexOf("uc08") === 0) || id === "uc03-cabinet";
+    paint();
+    if(push !== false && location.hash.slice(1) !== id) location.hash = id;
+  }
+
+  document.addEventListener("click", function(ev){
+    var t = ev.target.closest("[data-go]");
+    if(t){ show(t.getAttribute("data-go")); }
+  });
+
+  $("#f03").onclick = function(){ show("uc03-start") };
+  $("#f08").onclick = function(){ D.auth = true; show("uc08-cards") };
+
+  $("#doLogin").onclick = function(){
+    var ph = $("#ph").value.replace(/\D/g, "");
+    if(ph === "79990000000") return show("uc03-blocked");
+    if($("#pw").value === "123456") return show("uc03-cabinet");
+    show("uc03-error");
+  };
+
+  $("#doPay").onclick = function(){
+    var sum = parseInt(($("#am").value || "").replace(/\s/g, ""), 10);
+    if(isNaN(sum) || sum < 100 || sum > 50000){ $("#amErr").hidden = false; return; }
+    $("#amErr").hidden = true;
+    if(($("#bk").value || "").replace(/\s/g, "").slice(-4) === "0000") return show("uc08-error");
+    D.bal += sum;
+    var bonus = sum > 5000;
+    if(bonus) D.pts += 50;
+    D.op += 1;
+    $("#opNo").textContent = "№ " + D.op + " · Пополнение";
+    $("#okText").textContent = bonus
+      ? "Баланс карты пополнен на " + fmt(sum) + " ₽. Сумма превысила 5 000 ₽ — начислено 50 фитнес-баллов."
+      : "Баланс карты пополнен на " + fmt(sum) + " ₽.";
+    show("uc08-success");
+  };
+
+  $("#reset").onclick = function(){
+    D = {bal:1150, pts:420, auth:false, op:10842};
+    $("#pw").value = ""; $("#am").value = ""; $("#ph").value = "+7 999 123-45-67";
+    $("#bk").value = "4276 1234 5678 9012"; $("#amErr").hidden = true;
+    show("uc03-start");
+  };
+
+  // состояния, нужные для съёмки макетов в отчёт
+  var presets = {
+    "uc03-filled":  function(){ $("#pw").value = "123456"; return "uc03-login" },
+    "uc08-filled":  function(){ $("#am").value = "6 000"; return "uc08-form" },
+    "uc08-paid":    function(){ D.bal = 7150; D.pts = 470;
+                      $("#opNo").textContent = "№ 10843 · Пополнение";
+                      $("#okText").textContent = "Баланс карты пополнен на 6 000 ₽. Сумма превысила 5 000 ₽ — начислено 50 фитнес-баллов.";
+                      return "uc08-success" }
+  };
+
+  function route(){
+    var h = location.hash.slice(1);
+    if(presets[h]) return show(presets[h](), false);
+    show(h || "uc03-start", false);
+  }
+  window.addEventListener("hashchange", route);
+  route();
+})();
+</script>
